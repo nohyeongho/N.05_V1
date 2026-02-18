@@ -978,6 +978,7 @@
                     <div class="editor-toolbar">
                         <button onclick="insertMarkdown('**', '**')" title="굵게"><i class="fas fa-bold"></i></button>
                         <button onclick="insertMarkdown('*', '*')" title="기울임"><i class="fas fa-italic"></i></button>
+                        <button onclick="clearTextarea(this)" title="내용 지우기" style="color: #666; margin-left: auto;"><i class="fas fa-trash-alt"></i></button>
                     </div>
                     <div id="inActionSummary" class="editor-content-view paste-area" contenteditable="true"
                         placeholder="내용을 입력하세요...">LQC 모드 진입 시에만 발생되며, 에러 발생 시 메인 PCB 교체 안내</div>
@@ -1420,31 +1421,33 @@ ${htmlContent}`;
 
             const postDataHtml = `<div class="postData" data-productlv2="${pLv2}" data-productlv3="${pLv3}" data-model="${pModel}"></div>`;
 
+            // Build table rows dynamically
+            const tableRows = [];
+            if (title && title.trim()) {
+                tableRows.push(`<tr><th class="xfe_just_info">제목</th><td>${title}</td></tr>`);
+            }
+            if (productFamily && productFamily.trim()) {
+                tableRows.push(`<tr><th class="xfe_just_info">제품군</th><td>${productFamily}</td></tr>`);
+            }
+            if (appliedModel && appliedModel.trim()) {
+                tableRows.push(`<tr><th class="xfe_just_info">적용 모델</th><td>${appliedModel}</td></tr>`);
+            }
+            if (targetSerial && targetSerial.trim()) {
+                tableRows.push(`<tr><th class="xfe_just_info">대상 제번</th><td>${targetSerial}</td></tr>`);
+            }
+            
+            // Check if actionSummary has meaningful content
+            const actionSummaryText = actionSummary.replace(/<[^>]*>/g, '').trim();
+            if (actionSummaryText && actionSummaryText !== '내용을 입력하세요...') {
+                tableRows.push(`<tr><th class="xfe_just_info">조치 방법</th><td>${actionSummaryHtml}</td></tr>`);
+            }
+
             const contentBody = `
 <div class="tbl-scroll">
 <table style="width: 600px; border-collapse: collapse;" class="xfe_just_info">
 <tbody>
-</tbody><thead></thead>
-<tbody><tr>
-<th class="xfe_just_info">제목</th>
-<td>${title}</td>
-</tr>
-<tr>
-<th class="xfe_just_info">제품군</th>
-<td>${productFamily}</td>
-</tr>
-<tr>
-<th class="xfe_just_info">적용 모델</th>
-<td>${appliedModel}</td>
-</tr>
-<tr>
-<th class="xfe_just_info">대상 제번</th>
-<td>${targetSerial}</td>
-</tr>
-<tr>
-<th class="xfe_just_info">조치 방법</th>
-<td>${actionSummaryHtml}</td>
-</tr></tbody>
+${tableRows.join('\n')}
+</tbody>
 </table>
 </div>
 ${sectionsHtml}`;
